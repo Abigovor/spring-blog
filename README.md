@@ -1,4 +1,13 @@
-  Запросы к API и ответы определены в формате JSON.
+  Java simple Blog
+===
+
+[![Heroku](https://heroku-badge.herokuapp.com/?app=my-spring-simple-blog&style=flat)](https://my-spring-simple-blog.herokuapp.com/)
+
+[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](http://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/made-with-java.svg)](http://forthebadge.com)
+  
+  
+  ## Запросы к API и ответы определены в формате JSON.
 
 ## Формат ответов
 
