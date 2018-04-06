@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.Optional;
 
 @RestController
@@ -48,9 +47,6 @@ public class BlogController {
 
         User creator = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if (post.getCreatedAt() == null)
-            post.setCreatedAt(new Date());
-
         post.setUser(creator);
         return postService.save(post);
     }
@@ -59,9 +55,6 @@ public class BlogController {
     Post updatePost(@PathVariable int id, @RequestBody Post post) {
 
         User userDetails = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (post.getUpdatedAt() == null)
-            post.setUpdatedAt(new Date());
 
         Optional<Post> updated = postService.findByPostIdAndCreatorId(id, userDetails.getId());
 
