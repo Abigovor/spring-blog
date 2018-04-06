@@ -1,5 +1,6 @@
 package org.abigovor.springblog.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ public class User {
     @Id @GeneratedValue private Integer id;
     private String username;
     private String email;
+    @JsonIgnore
     private String password;
     private Integer age;
     private String description;
