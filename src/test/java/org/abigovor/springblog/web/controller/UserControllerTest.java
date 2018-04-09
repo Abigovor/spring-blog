@@ -1,6 +1,7 @@
 package org.abigovor.springblog.web.controller;
 
 import org.abigovor.springblog.domain.User;
+import org.abigovor.springblog.domain.UserRegistration;
 import org.abigovor.springblog.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +29,10 @@ import java.util.Optional;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -93,6 +97,59 @@ public class UserControllerTest {
 
         mockMvc.perform(get("/user/get/1"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void registration() throws Exception {
+        UserRegistration userRegistration = new UserRegistration();
+        userRegistration.setEmail("test@tra.org");
+        userRegistration.setPassword("123");
+        userRegistration.setPasswordConfirmation("123");
+
+        User createdUser = new User("Bob", userRegistration.getEmail(), userRegistration.getPassword(), 34, "about bob");
+
+        when(userService.save(Matchers.any(User.class))).thenReturn(createdUser);
+        when(userService.findByEmail("test@tra.org")).thenReturn(null);
+
+        mockMvc.perform(post("/register")
+                .content("{\"email\":\"test@tra.org\",\"password\":\"123\",\"passwordConfirmation\":\"123\"}")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(content().string("User created"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void registrationUserAlreadyExists() throws Exception {
+        UserRegistration userRegistration = new UserRegistration();
+        userRegistration.setEmail("test@tra.org");
+        userRegistration.setPassword("123");
+        userRegistration.setPasswordConfirmation("123");
+
+        User createdUser = new User("Bob", userRegistration.getEmail(), userRegistration.getPassword(), 34, "about bob");
+
+        when(userService.save(Matchers.any(User.class))).thenReturn(createdUser);
+        when(userService.findByEmail("test@tra.org")).thenReturn(Optional.of(createdUser));
+
+        mockMvc.perform(post("/register")
+                .content("{\"email\":\"test@tra.org\",\"password\":\"123\",\"passwordConfirmation\":\"123\"}")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string("User already exists"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void registrationPasswordNotMatch() throws Exception {
+        UserRegistration userRegistration = new UserRegistration();
+        userRegistration.setEmail("test@tra.org");
+        userRegistration.setPassword("123");
+        userRegistration.setPasswordConfirmation("1123");
+
+        mockMvc.perform(post("/register")
+                .content("{\"email\":\"test@tra.org\",\"password\":\"123\",\"passwordConfirmation\":\"1123\"}")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string("Password do not match"))
+                .andExpect(status().isOk());
     }
 
     @Test
